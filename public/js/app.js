@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Initial Setup ---
     initializeMap();
-    locationsGrid.innerHTML = '<p class="text-gray-500 col-span-full text-center">Click the button above to find recycling centers or shops near you.</p>';
+    locationsGrid.innerHTML = '<p class="text-gray-500 col-span-full text-center">Detected recycling centers or shops near you will appear here. Click the button above to scan.</p>';
     getLocationButton.addEventListener('click', handleGetLocation);
     searchButton.addEventListener('click', handleManualSearch);
     searchInput.addEventListener('keyup', (event) => {
