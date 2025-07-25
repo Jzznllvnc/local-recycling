@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ScrapNear - Your Local Recycling Guide</title>
-    <link rel="icon" href="assets/images/logo.png" type="image/png">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css">
@@ -17,40 +16,51 @@
         #map { height: 450px; }
     </style>
 </head>
-<!-- UPDATED: Changed body background to a dark color -->
-<body class="bg-black/85 text-gray-800">
+<body class="bg-black/90 text-gray-800">
 
-    <!-- Header with darker, more transparent background and updated text colors -->
+    <!-- Header -->
     <header class="sticky top-0 z-50 bg-black/40 backdrop-blur-lg shadow-lg transition-all">
         <div class="container mx-auto px-8 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex-shrink-0">
-                    <a href="#" class="flex items-center text-2xl font-bold text-white">
+                    <a href="index.html" class="flex items-center text-2xl font-bold text-white">
                         <img src="assets/images/logo.png" alt="ScrapNear Logo" class="h-14 w-14">
                         <span class="text-green-400">Scrap</span><span>Near</span>
                     </a>
                 </div>
+                <!-- Desktop Navigation -->
                 <nav class="hidden md:flex space-x-8">
-                    <a href="#" class="text-gray-300 hover:text-white font-medium">Home</a>
+                    <a href="index.html" class="text-white font-medium">Home</a>
                     <a href="docs.html" class="text-gray-300 hover:text-white font-medium">Docs</a>
                     <a href="report.html" class="text-gray-300 hover:text-white font-medium">Report a Bug</a>
                 </nav>
+                <!-- Mobile Menu Button -->
                 <div class="md:hidden">
-                    <button class="text-gray-300 hover:text-white focus:outline-none">
+                    <button id="mobile-menu-button" class="text-gray-300 hover:text-white focus:outline-none">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
                     </button>
                 </div>
+            </div>
+        </div>
+        <!-- Mobile Menu, hidden by default -->
+        <div id="mobile-menu" class="hidden md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 text-right">
+                <a href="index.html" class="text-white block px-3 py-2 rounded-md text-base font-medium">Home</a>
+                <a href="docs.html" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Docs</a>
+                <a href="report.html" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Report a Bug</a>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
     <main>
+        
+        <!-- Hero Search Section -->
         <section 
-            class="relative text-center py-20 md:py-32 bg-[#171717]">
+            class="relative text-center py-20 md:py-32 bg-gradient-to-r from-black/85 via-black/50 to-gray-500">
+            
             <div class="absolute inset-0 bg-black/60"></div>
 
-            <!-- Content container -->
             <div class="relative container mx-auto px-4 sm:px-6 lg:px-8">
                 <h1 class="text-4xl md:text-6xl font-extrabold text-white leading-tight">
                     Find Recycling Shops <span class="text-green-400">Near You</span>
@@ -59,15 +69,13 @@
                     Easily locate junk shops and recycling facilities for your paper, plastics, electronics, and more. Click the button to use your current location or enter an address manually.
                 </p>
                 
-                <!-- Action Buttons -->
                 <div class="mt-16 max-w-2xl mx-auto flex flex-col md:flex-row items-center justify-center gap-4">
-                    <button id="getLocationButton" class="w-full md:w-auto bg-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700 transition duration-300 flex items-center justify-center gap-3 text-lg">
+                    <button id="getLocationButton" class="md:w-auto bg-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700 transition duration-300 flex items-center justify-center gap-3 text-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="2" x2="5" y1="12" y2="12"/><line x1="19" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="5"/><line x1="12" x2="12" y1="19" y2="22"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/></svg>
                         Find Shops Near Me
                     </button>
                 </div>
                 
-                <!-- Manual Search Fallback -->
                 <div class="mt-6 max-w-xl mx-auto flex flex-col sm:flex-row gap-4">
                     <input type="text" id="searchInput" placeholder="Or enter a location manually..." class="w-full px-5 py-3 rounded-lg border-2 border-gray-300 focus:ring-green-500 focus:border-green-500 transition duration-300">
                     <button id="searchButton" class="w-full sm:w-auto bg-transparent border-2 border-gray-400 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-600 hover:border-green-600 transition duration-300">Search</button>
@@ -77,7 +85,6 @@
 
         <!-- Wrapper for the white, rounded background effect -->
         <div class="relative bg-white rounded-t-2xl lg:rounded-t-3xl -mt-12 z-10">
-            <!-- Map and Locations Section -->
             <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <section id="map-section" class="mb-12">
                      <div id="map" class="w-full h-96 md:h-[450px] rounded-xl shadow-lg z-0 overflow-hidden"></div>
@@ -115,7 +122,18 @@
         </div>
     </footer>
 
+    <!-- JS Libraries -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="js/app.js"></script>
+    
+    <!-- Script for mobile menu -->
+    <script>
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
 </body>
 </html>
