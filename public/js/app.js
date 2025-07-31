@@ -58,17 +58,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const marker = L.marker([lat, lon]).bindPopup(`<b>${name}</b><br>${address}`).addTo(markersLayer);
             
             const cardHTML = `
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 border-t-4 border-green-500">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 border-l-4 border-green-500">
                     <div class="p-6">
-                        <h3 class="text-lg font-bold text-gray-800 truncate">${name}</h3>
-                        <p class="text-gray-600 mt-2 text-sm h-10">${address}</p>
-                        <div class="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between">
+                        <div class="flex items-start">
+                            <div class="bg-green-100 p-2 rounded-lg mr-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">${name}</h3>
+                                <p class="text-gray-600 mt-1 text-sm">${address}</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
                             <div class="flex items-center text-sm text-gray-500">
-                                <svg class="w-4 h-4 mr-1.5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                                <svg class="w-4 h-4 mr-1.5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                                </svg>
                                 <span>${distance} km away</span>
                             </div>
-                            <a href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-green-600 hover:text-green-800 transition-colors">
+                            <a href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-green-600 hover:text-green-800 transition-colors flex items-center">
                                 Get Directions
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
                             </a>
                         </div>
                     </div>

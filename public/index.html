@@ -13,42 +13,76 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        #map { height: 450px; }
+        body { 
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #10b981 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .search-input {
+            transition: all 0.3s ease;
+        }
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+        }
+        .location-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3), 0 2px 4px -1px rgba(16, 185, 129, 0.1);
+        }
+        .location-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3), 0 4px 6px -2px rgba(16, 185, 129, 0.1);
+        }
+        #map { 
+            height: 450px;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
-<body class="bg-black/90 text-gray-800">
+<body class="text-gray-100">
 
     <!-- Header -->
-    <header class="sticky top-0 z-50 bg-black/40 backdrop-blur-lg shadow-lg transition-all">
-        <div class="container mx-auto px-8 sm:px-6 lg:px-8">
+    <header class="sticky top-0 z-50 bg-black/80 backdrop-blur-lg shadow-lg transition-all border-b border-gray-800">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex-shrink-0">
-                    <a href="index.html" class="flex items-center text-2xl font-bold text-white">
-                        <img src="assets/images/logo.png" alt="ScrapNear Logo" class="h-14 w-14">
-                        <span class="text-green-400">Scrap</span><span>Near</span>
+                    <a href="index.html" class="flex items-center text-2xl font-bold">
+                        <img src="assets/images/logo.png" alt="ScrapNear Logo" class="h-10 w-10 mr-2">
+                        <span class="gradient-text">ScrapNear</span>
                     </a>
                 </div>
                 <!-- Desktop Navigation -->
                 <nav class="hidden md:flex space-x-8">
-                    <a href="index.html" class="text-white font-medium">Home</a>
-                    <a href="docs.html" class="text-gray-300 hover:text-white font-medium">Docs</a>
-                    <a href="report.html" class="text-gray-300 hover:text-white font-medium">Report a Bug</a>
+                    <a href="index.html" class="text-white font-medium hover:text-green-400 transition-colors">Home</a>
+                    <a href="docs.html" class="text-gray-400 hover:text-green-400 font-medium transition-colors">Docs</a>
+                    <a href="report.html" class="text-gray-400 hover:text-green-400 font-medium transition-colors">Report</a>
                 </nav>
                 <!-- Mobile Menu Button -->
                 <div class="md:hidden">
-                    <button id="mobile-menu-button" class="text-gray-300 hover:text-white focus:outline-none">
+                    <button id="mobile-menu-button" class="text-gray-400 hover:text-white focus:outline-none transition-colors">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
                     </button>
                 </div>
             </div>
         </div>
         <!-- Mobile Menu, hidden by default -->
-        <div id="mobile-menu" class="hidden md:hidden">
+        <div id="mobile-menu" class="hidden md:hidden bg-black/90 backdrop-blur-sm">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 text-right">
-                <a href="index.html" class="text-white block px-3 py-2 rounded-md text-base font-medium">Home</a>
-                <a href="docs.html" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Docs</a>
-                <a href="report.html" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Report a Bug</a>
+                <a href="index.html" class="text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800 transition-colors">Home</a>
+                <a href="docs.html" class="text-gray-400 hover:text-white hover:bg-gray-800 block px-3 py-2 rounded-md text-base font-medium transition-colors">Docs</a>
+                <a href="report.html" class="text-gray-400 hover:text-white hover:bg-gray-800 block px-3 py-2 rounded-md text-base font-medium transition-colors">Report</a>
             </div>
         </div>
     </header>
@@ -57,42 +91,43 @@
     <main>
         
         <!-- Hero Search Section -->
-        <section 
-            class="relative text-center py-20 md:py-32 bg-gradient-to-r from-black/85 via-black/50 to-gray-500">
-            
-            <div class="absolute inset-0 bg-black/60"></div>
+        <section class="relative text-center py-20 md:py-32 bg-gradient-to-br from-gray-900 via-black to-gray-800">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
 
             <div class="relative container mx-auto px-4 sm:px-6 lg:px-8">
-                <h1 class="text-4xl md:text-6xl font-extrabold text-white leading-tight">
-                    Find Recycling Shops <span class="text-green-400">Near You</span>
+                <h1 class="text-4xl md:text-6xl font-extrabold leading-tight">
+                    Find Recycling Shops <br><span class="gradient-text">Near You</span>
                 </h1>
-                <p class="mt-14 max-w-3xl mx-auto text-lg text-gray-200">
+                <p class="mt-6 max-w-3xl mx-auto text-lg text-gray-300">
                     Easily locate junk shops and recycling facilities for your paper, plastics, electronics, and more. Click the button to use your current location or enter an address manually.
                 </p>
                 
-                <div class="mt-16 max-w-2xl mx-auto flex flex-col md:flex-row items-center justify-center gap-4">
-                    <button id="getLocationButton" class="md:w-auto bg-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700 transition duration-300 flex items-center justify-center gap-3 text-lg">
+                <div class="mt-12 max-w-2xl mx-auto flex flex-col md:flex-row items-center justify-center gap-4">
+                    <button id="getLocationButton" class="location-button md:w-auto bg-gradient-to-r from-green-600 to-green-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-green-700 hover:to-green-600 transition-all flex items-center justify-center gap-3 text-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="2" x2="5" y1="12" y2="12"/><line x1="19" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="5"/><line x1="12" x2="12" y1="19" y2="22"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/></svg>
                         Find Shops Near Me
                     </button>
                 </div>
                 
                 <div class="mt-6 max-w-xl mx-auto flex flex-col sm:flex-row gap-4">
-                    <input type="text" id="searchInput" placeholder="Or enter a location manually..." class="w-full px-5 py-3 rounded-lg border-2 border-gray-300 focus:ring-green-500 focus:border-green-500 transition duration-300">
-                    <button id="searchButton" class="w-full sm:w-auto bg-transparent border-2 border-gray-400 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-600 hover:border-green-600 transition duration-300">Search</button>
+                    <input type="text" id="searchInput" placeholder="Or enter a location manually..." class="search-input w-full px-5 py-3 rounded-xl bg-gray-800 border-2 border-gray-700 focus:border-green-500 focus:ring-0 text-white placeholder-gray-400 transition-all">
+                    <button id="searchButton" class="w-full sm:w-auto bg-transparent border-2 border-gray-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-600 hover:border-green-600 transition-all">Search</button>
                 </div>
             </div>
         </section>
 
         <!-- Wrapper for the white, rounded background effect -->
-        <div class="relative bg-white rounded-t-2xl lg:rounded-t-3xl -mt-12 z-10">
+        <div class="relative bg-white rounded-t-3xl -mt-12 z-10">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <section id="map-section" class="mb-12">
-                     <div id="map" class="w-full h-96 md:h-[450px] rounded-xl shadow-lg z-0 overflow-hidden"></div>
+                     <div id="map" class="w-full h-96 md:h-[450px] rounded-xl z-0 overflow-hidden border border-gray-200"></div>
                 </section>
                 <section id="locations-list">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Nearby Locations &nbsp;<i class="fa-solid fa-location-dot" style="color: #ff0000;"></i></h2>
-                    <div id="locations-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <span>Nearby Locations</span>
+                        <i class="fa-solid fa-location-dot ml-2 text-red-500"></i>
+                    </h2>
+                    <div id="locations-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <!-- Location cards will be dynamically inserted here -->
                     </div>
                 </section>
@@ -136,7 +171,7 @@
             mobileMenu.classList.toggle('hidden');
         });
     </script>
-            <!-- Vercel Analytics -->
+    <!-- Vercel Analytics -->
     <script>
         window.va = window.va || function () { (window.va.q = window.va.q || []).push(arguments); };
         window.va('create', 'prj_Dg6S5z1Bdh70IA22ApN7wDG2ITmd');
