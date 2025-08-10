@@ -4,6 +4,10 @@ ScrapNear is a user-friendly web application designed to help people easily loca
 
 ---
 
+<p align="center">
+  <img src="mainpage.png" alt="ScrapNear Application Screenshot" width="100%">
+</p>
+
 ## Purpose
 
 The main goal of ScrapNear is to promote recycling and proper waste management by making it effortless for users to find local centers. By providing an accessible tool, the project aims to encourage more people to participate in recycling efforts, contributing to a cleaner environment.
