@@ -5,7 +5,7 @@ ScrapNear is a user-friendly web application designed to help people easily loca
 ---
 
 <p align="center">
-  <img src="mainpage.png" alt="ScrapNear Application Screenshot" width="100%">
+  <img src="scrapp.png" alt="ScrapNear Application Screenshot" width="100%">
 </p>
 
 ## Purpose
