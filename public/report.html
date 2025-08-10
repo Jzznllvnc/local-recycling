@@ -6,6 +6,16 @@
     <title>Report a Bug - ScrapNear</title>
     <link rel="icon" href="assets/images/logo.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>
+        // Fallback CDN if primary fails
+        if (typeof emailjs === 'undefined') {
+            const fallbackScript = document.createElement('script');
+            fallbackScript.src = 'https://cdn.emailjs.com/npm/@emailjs/browser@3/dist/email.min.js';
+            fallbackScript.type = 'text/javascript';
+            document.head.appendChild(fallbackScript);
+        }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -59,18 +69,45 @@
                     <div>
                         <label for="issue-type" class="block text-sm font-medium text-gray-700 mb-2">Type of Issue</label>
                         <div class="relative">
-                            <select id="issue-type" name="issue-type" class="appearance-none w-full py-3 px-4 pr-10 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 input-focus transition-colors">
-                                <option>Incorrect Location or Address</option>
-                                <option>Map Display Problem</option>
-                                <option>Button Not Working</option>
-                                <option>Suggestion</option>
-                                <option>Other</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
-                                <svg id="issue-type-arrow" class="h-5 w-5 text-gray-500 transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                                </svg>
+                            <!-- Custom Dropdown -->
+                            <div id="custom-dropdown" class="relative">
+                                <button id="dropdown-button" type="button" class="w-full py-3 px-4 pr-10 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 input-focus transition-all duration-200 bg-white text-left hover:border-gray-300 hover:bg-gray-50" aria-haspopup="listbox" aria-expanded="false">
+                                    <span id="dropdown-selected" class="block truncate text-gray-900">Incorrect Location or Address</span>
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                        <svg id="dropdown-arrow" class="h-5 w-5 text-gray-500 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                        </svg>
+                                    </span>
+                                </button>
+
+                                <!-- Dropdown Panel -->
+                                <div id="dropdown-panel" class="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-lg border border-gray-200 py-1 opacity-0 invisible transform scale-95 transition-all duration-200 origin-top">
+                                    <ul class="max-h-60 overflow-auto text-base" role="listbox">
+                                        <li class="dropdown-option cursor-pointer select-none relative py-3 px-4 hover:bg-green-50 hover:text-green-700 transition-colors duration-150 text-gray-900 bg-green-50 text-green-700" data-value="Incorrect Location or Address" role="option">
+                                            <span class="block truncate font-medium">Incorrect Location or Address</span>
+                                            <span class="absolute inset-y-0 right-0 flex items-center pr-4">
+                                                <svg class="h-5 w-5 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                                </svg>
+                                            </span>
+                                        </li>
+                                        <li class="dropdown-option cursor-pointer select-none relative py-3 px-4 hover:bg-green-50 hover:text-green-700 transition-colors duration-150 text-gray-900" data-value="Map Display Problem" role="option">
+                                            <span class="block truncate">Map Display Problem</span>
+                                        </li>
+                                        <li class="dropdown-option cursor-pointer select-none relative py-3 px-4 hover:bg-green-50 hover:text-green-700 transition-colors duration-150 text-gray-900" data-value="Button Not Working" role="option">
+                                            <span class="block truncate">Button Not Working</span>
+                                        </li>
+                                        <li class="dropdown-option cursor-pointer select-none relative py-3 px-4 hover:bg-green-50 hover:text-green-700 transition-colors duration-150 text-gray-900" data-value="Suggestion" role="option">
+                                            <span class="block truncate">Suggestion</span>
+                                        </li>
+                                        <li class="dropdown-option cursor-pointer select-none relative py-3 px-4 hover:bg-green-50 hover:text-green-700 transition-colors duration-150 text-gray-900" data-value="Other" role="option">
+                                            <span class="block truncate">Other</span>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
+                            <!-- Hidden input to store the selected value -->
+                            <input type="hidden" id="issue-type" name="issue-type" value="Incorrect Location or Address">
                         </div>
                     </div>
 
@@ -80,6 +117,31 @@
                             <textarea id="description" name="description" rows="5" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 input-focus transition-colors" placeholder="Please describe the issue in detail. What were you doing when the problem occurred?"></textarea>
                         </div>
                         <p class="mt-1 text-xs text-gray-500">Be as specific as possible to help us reproduce and fix the issue.</p>
+                    </div>
+
+                    <div>
+                        <label for="screenshot" class="block text-sm font-medium text-gray-700 mb-2">Screenshots (Optional)</label>
+                        <div class="mt-1">
+                            <div id="screenshot-upload-area" class="relative border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:border-green-300 transition-colors cursor-pointer">
+                                <input type="file" id="screenshot" name="screenshot" accept="image/*" multiple class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                <div id="upload-prompt" class="flex flex-col items-center">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    <div class="mt-2">
+                                        <span class="text-sm font-medium text-green-600 hover:text-green-500">Upload screenshots</span>
+                                        <p class="text-xs text-gray-500">or drag and drop</p>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 10MB each</p>
+                                    <p class="text-xs text-green-600 mt-1 font-medium">Maximum 2 images</p>
+                                </div>
+                            </div>
+                            <!-- Screenshots Preview Grid -->
+                            <div id="screenshots-grid" class="hidden mt-4 grid grid-cols-2 gap-4">
+                                <!-- Preview items will be dynamically added here -->
+                            </div>
+                        </div>
+                        <p class="mt-2 text-xs text-gray-500">Upload up to 2 screenshots to help us understand the issue better.</p>
                     </div>
 
                     <div>
@@ -147,34 +209,251 @@
     </div>
 
     <script>
-        const issueTypeSelect = document.getElementById('issue-type');
-        const issueTypeArrow = document.getElementById('issue-type-arrow');
+        // Custom Dropdown Functionality
+        const dropdownButton = document.getElementById('dropdown-button');
+        const dropdownPanel = document.getElementById('dropdown-panel');
+        const dropdownArrow = document.getElementById('dropdown-arrow');
+        const dropdownSelected = document.getElementById('dropdown-selected');
+        const issueTypeInput = document.getElementById('issue-type');
+        const dropdownOptions = document.querySelectorAll('.dropdown-option');
 
-        issueTypeSelect.addEventListener('focus', () => {
-            issueTypeArrow.classList.add('rotate-180');
+        // Toggle dropdown
+        dropdownButton.addEventListener('click', () => {
+            const isOpen = dropdownButton.getAttribute('aria-expanded') === 'true';
+            toggleDropdown(!isOpen);
         });
 
-        issueTypeSelect.addEventListener('blur', () => {
-            issueTypeArrow.classList.remove('rotate-180');
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!dropdownButton.contains(e.target) && !dropdownPanel.contains(e.target)) {
+                toggleDropdown(false);
+            }
         });
 
+        // Handle option selection
+        dropdownOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const value = option.getAttribute('data-value');
+                selectOption(value);
+                toggleDropdown(false);
+            });
+        });
 
-        // --- Existing script for form submission modal ---
+        // Handle keyboard navigation
+        dropdownButton.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const isOpen = dropdownButton.getAttribute('aria-expanded') === 'true';
+                toggleDropdown(!isOpen);
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                toggleDropdown(true);
+                focusFirstOption();
+            }
+        });
+
+        dropdownPanel.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                toggleDropdown(false);
+                dropdownButton.focus();
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                focusNextOption();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                focusPreviousOption();
+            }
+        });
+
+        function toggleDropdown(open) {
+            dropdownButton.setAttribute('aria-expanded', open);
+            
+            if (open) {
+                dropdownPanel.classList.remove('opacity-0', 'invisible', 'scale-95');
+                dropdownPanel.classList.add('opacity-100', 'visible', 'scale-100');
+                dropdownArrow.classList.add('rotate-180');
+            } else {
+                dropdownPanel.classList.add('opacity-0', 'invisible', 'scale-95');
+                dropdownPanel.classList.remove('opacity-100', 'visible', 'scale-100');
+                dropdownArrow.classList.remove('rotate-180');
+            }
+        }
+
+        function selectOption(value) {
+            // Update selected text and hidden input
+            dropdownSelected.textContent = value;
+            issueTypeInput.value = value;
+
+            // Update visual selection
+            dropdownOptions.forEach(option => {
+                const isSelected = option.getAttribute('data-value') === value;
+                const checkIcon = option.querySelector('svg');
+                
+                if (isSelected) {
+                    option.classList.add('bg-green-50', 'text-green-700');
+                    option.classList.remove('text-gray-900');
+                    option.querySelector('span').classList.add('font-medium');
+                    if (checkIcon) checkIcon.style.display = 'block';
+                } else {
+                    option.classList.remove('bg-green-50', 'text-green-700');
+                    option.classList.add('text-gray-900');
+                    option.querySelector('span').classList.remove('font-medium');
+                    if (checkIcon) checkIcon.style.display = 'none';
+                }
+            });
+        }
+
+        function focusFirstOption() {
+            const firstOption = dropdownPanel.querySelector('.dropdown-option');
+            if (firstOption) firstOption.focus();
+        }
+
+        function focusNextOption() {
+            const activeElement = document.activeElement;
+            const options = Array.from(dropdownOptions);
+            const currentIndex = options.indexOf(activeElement);
+            const nextIndex = (currentIndex + 1) % options.length;
+            options[nextIndex].focus();
+        }
+
+        function focusPreviousOption() {
+            const activeElement = document.activeElement;
+            const options = Array.from(dropdownOptions);
+            const currentIndex = options.indexOf(activeElement);
+            const prevIndex = currentIndex <= 0 ? options.length - 1 : currentIndex - 1;
+            options[prevIndex].focus();
+        }
+
+        // Form validation and submission
         const reportForm = document.getElementById('report-form');
         const successModal = document.getElementById('success-modal');
         const closeModalButton = document.getElementById('close-modal-button');
 
-        reportForm.addEventListener('submit', (event) => {
+        // Wait for EmailJS to load
+        function initializeEmailJS() {
+            if (typeof emailjs === 'undefined') {
+                setTimeout(initializeEmailJS, 1000);
+                return;
+            }
+
+            // Initialize EmailJS
+            emailjs.init('EaP4eCx0d0yPChlJQ');
+        }
+
+        // Initialize when page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeEmailJS);
+        } else {
+            initializeEmailJS();
+        }
+
+        reportForm.addEventListener('submit', async (event) => {
             event.preventDefault();
 
-            // Show modal with animation
+            // Get form data
+            const formData = new FormData(reportForm);
+            const data = {
+                issue_type: formData.get('issue-type'),
+                description: formData.get('description'),
+                user_email: formData.get('email') || 'No email provided',
+                screenshots_count: currentScreenshots.length,
+                screenshot1_data: currentScreenshots[0] ? currentScreenshots[0].data : '',
+                screenshot1_name: currentScreenshots[0] ? currentScreenshots[0].name : '',
+                screenshot2_data: currentScreenshots[1] ? currentScreenshots[1].data : '',
+                screenshot2_name: currentScreenshots[1] ? currentScreenshots[1].name : ''
+            };
+
+            // Basic validation
+            if (!data.description.trim()) {
+                showErrorMessage('Please provide a description of the issue.');
+                return;
+            }
+
+            // Show loading state
+            const submitButton = reportForm.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Submitting...
+            `;
+            submitButton.disabled = true;
+
+            // Check if EmailJS is loaded
+            if (typeof emailjs === 'undefined') {
+                showErrorMessage('Email service is not ready. Please refresh the page and try again.');
+                // Restore button state
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
+                return;
+            }
+
+            try {
+                // Send email using EmailJS
+                const response = await emailjs.send(
+                    'service_nq8x0al',
+                    'template_tbidcki',
+                    {
+                        issue_type: data.issue_type,
+                        description: data.description,
+                        user_email: data.user_email,
+                        user_name: data.user_email.split('@')[0] || 'Anonymous',
+                        report_date: new Date().toLocaleString(),
+                        screenshots_count: data.screenshots_count,
+                        screenshot1_data: data.screenshot1_data,
+                        screenshot1_name: data.screenshot1_name,
+                        screenshot2_data: data.screenshot2_data,
+                        screenshot2_name: data.screenshot2_name
+                    }
+                );
+
+                if (response.status === 200) {
+                    // Show success modal
+                    showSuccessModal();
+                    reportForm.reset();
+                    selectOption('Incorrect Location or Address'); // Reset dropdown
+                    // Reset screenshots
+                    currentScreenshots = [];
+                    updateScreenshotsDisplay();
+                } else {
+                    throw new Error('Failed to submit report. Please try again.');
+                }
+            } catch (error) {
+                showErrorMessage('There was an error submitting your report. Please try again later.');
+            } finally {
+                // Restore button state
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
+            }
+        });
+
+        function showSuccessModal() {
             successModal.classList.remove('hidden', 'invisible', 'opacity-0');
             document.querySelector('#success-modal > div').classList.remove('scale-95');
             document.querySelector('#success-modal > div').classList.add('scale-100');
+        }
+
+        function showErrorMessage(message) {
+            // Create or update error message element
+            let errorElement = document.getElementById('form-error-message');
+            if (!errorElement) {
+                errorElement = document.createElement('div');
+                errorElement.id = 'form-error-message';
+                errorElement.className = 'bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-4';
+                reportForm.insertBefore(errorElement, reportForm.firstChild);
+            }
+            errorElement.textContent = message;
+            errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             
-            // Reset form
-            reportForm.reset();
-        });
+            // Remove error message after 5 seconds
+            setTimeout(() => {
+                if (errorElement) {
+                    errorElement.remove();
+                }
+            }, 5000);
+        }
 
         closeModalButton.addEventListener('click', () => {
             // Hide modal with animation
@@ -186,6 +465,198 @@
                 successModal.classList.add('hidden', 'invisible');
             }, 300);
         });
+
+        // Initialize dropdown options display
+        dropdownOptions.forEach(option => {
+            const checkIcon = option.querySelector('svg');
+            if (checkIcon && option.getAttribute('data-value') !== 'Incorrect Location or Address') {
+                checkIcon.style.display = 'none';
+            }
+        });
+
+        // Screenshot upload functionality
+        const screenshotInput = document.getElementById('screenshot');
+        const uploadArea = document.getElementById('screenshot-upload-area');
+        const uploadPrompt = document.getElementById('upload-prompt');
+        const screenshotsGrid = document.getElementById('screenshots-grid');
+        let currentScreenshots = [];
+        const MAX_SCREENSHOTS = 2;
+
+        // Handle file selection
+        screenshotInput.addEventListener('change', handleFileSelect);
+
+        // Handle drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            if (currentScreenshots.length < MAX_SCREENSHOTS) {
+                uploadArea.classList.add('border-green-400', 'bg-green-50');
+            }
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('border-green-400', 'bg-green-50');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('border-green-400', 'bg-green-50');
+            
+            const files = Array.from(e.dataTransfer.files);
+            handleFiles(files);
+        });
+
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            const remainingSlots = MAX_SCREENSHOTS - currentScreenshots.length;
+            
+            if (files.length > remainingSlots) {
+                showErrorMessage(`You can only upload ${remainingSlots} more screenshot${remainingSlots !== 1 ? 's' : ''}. Maximum is ${MAX_SCREENSHOTS} images.`);
+                files = files.slice(0, remainingSlots);
+            }
+
+            files.forEach(file => {
+                if (currentScreenshots.length >= MAX_SCREENSHOTS) return;
+                
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    showErrorMessage(`"${file.name}" is not an image file. Please upload PNG, JPG, or GIF files.`);
+                    return;
+                }
+
+                // Validate file size (10MB limit)
+                const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+                if (file.size > maxSize) {
+                    showErrorMessage(`"${file.name}" is too large. File size must be less than 10MB.`);
+                    return;
+                }
+
+                // Compress and convert to base64
+                compressAndConvertImage(file, (compressedData) => {
+                    const screenshot = {
+                        data: compressedData,
+                        name: file.name,
+                        size: file.size,
+                        id: Date.now() + Math.random()
+                    };
+
+                    currentScreenshots.push(screenshot);
+                    updateScreenshotsDisplay();
+                }, (error) => {
+                    showErrorMessage(`Error processing "${file.name}". Please try again.`);
+                });
+            });
+
+            // Clear the input to allow re-uploading the same file
+            screenshotInput.value = '';
+        }
+
+        function updateScreenshotsDisplay() {
+            if (currentScreenshots.length === 0) {
+                uploadPrompt.classList.remove('hidden');
+                screenshotsGrid.classList.add('hidden');
+                uploadArea.classList.remove('border-green-400');
+                uploadArea.classList.add('border-gray-200');
+            } else {
+                uploadPrompt.classList.add('hidden');
+                screenshotsGrid.classList.remove('hidden');
+                uploadArea.classList.remove('border-gray-200');
+                uploadArea.classList.add('border-green-400');
+            }
+
+            // Update grid content
+            screenshotsGrid.innerHTML = '';
+            currentScreenshots.forEach((screenshot, index) => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'relative bg-gray-50 rounded-lg p-3 border border-gray-200';
+                
+                const img = document.createElement('img');
+                img.src = screenshot.data;
+                img.alt = `Screenshot ${index + 1}`;
+                img.className = 'w-full h-32 object-cover rounded-lg mb-2';
+                
+                const fileName = document.createElement('p');
+                fileName.className = 'text-xs text-gray-600 truncate mb-2';
+                fileName.textContent = screenshot.name;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'w-full text-xs text-red-600 hover:text-red-800 py-1 px-2 border border-red-200 rounded hover:bg-red-50 transition-colors';
+                removeBtn.textContent = 'Remove';
+                removeBtn.addEventListener('click', () => removeScreenshot(screenshot.id));
+                
+                previewItem.appendChild(img);
+                previewItem.appendChild(fileName);
+                previewItem.appendChild(removeBtn);
+                screenshotsGrid.appendChild(previewItem);
+            });
+
+            // Update upload area based on remaining slots
+            if (currentScreenshots.length >= MAX_SCREENSHOTS) {
+                uploadArea.style.pointerEvents = 'none';
+                uploadArea.classList.add('opacity-50');
+            } else {
+                uploadArea.style.pointerEvents = 'auto';
+                uploadArea.classList.remove('opacity-50');
+            }
+        }
+
+        function removeScreenshot(screenshotId) {
+            currentScreenshots = currentScreenshots.filter(s => s.id !== screenshotId);
+            updateScreenshotsDisplay();
+        }
+
+        // Image compression function to prevent "Content Too Large" errors
+        function compressAndConvertImage(file, onSuccess, onError) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+
+            img.onload = function() {
+                // Calculate new dimensions (max 400px width/height while maintaining aspect ratio)
+                const maxDimension = 400;
+                let { width, height } = img;
+                
+                if (width > height) {
+                    if (width > maxDimension) {
+                        height = (height * maxDimension) / width;
+                        width = maxDimension;
+                    }
+                } else {
+                    if (height > maxDimension) {
+                        width = (width * maxDimension) / height;
+                        height = maxDimension;
+                    }
+                }
+
+                // Set canvas size and draw resized image
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Convert to base64 with heavy compression (0.4 quality for JPEG)
+                const compressedData = canvas.toDataURL('image/jpeg', 0.4);
+                onSuccess(compressedData);
+            };
+
+            img.onerror = function() {
+                onError('Failed to load image');
+            };
+
+            // Load the image
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+            };
+            reader.onerror = function() {
+                onError('Failed to read file');
+            };
+            reader.readAsDataURL(file);
+        }
     </script>
     
     <!-- Vercel Analytics -->
