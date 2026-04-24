@@ -2,7 +2,7 @@
   "framework": "vite",
   "installCommand": "npm install --include=dev",
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "outputDirectory": "public/dist",
   "cleanUrls": true,
   "redirects": [
     {
