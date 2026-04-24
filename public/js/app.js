@@ -92,18 +92,33 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    async function fetchJson(url, fallbackMessage) {
+        const response = await fetch(url);
+        let data = null;
+
+        try {
+            data = await response.json();
+        } catch (error) {
+            data = null;
+        }
+
+        if (!response.ok) {
+            throw new Error(data?.message || fallbackMessage);
+        }
+
+        return data;
+    }
+
     /**
      * Fetches a high-quality, human-readable address for a location.
      */
     async function fetchAddressForLocation(location) {
         const lat = location.type === 'node' ? location.lat : location.center.lat;
         const lon = location.type === 'node' ? location.lon : location.center.lon;
-        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`;
+        const url = `/api/reverse-geocode?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`;
         
         try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error('Reverse geocoding request failed');
-            const data = await response.json();
+            const data = await fetchJson(url, 'Reverse geocoding request failed');
             
             if (data && data.address) {
                 const addr = data.address;
@@ -178,12 +193,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const radius = 5000; 
-            const query = `[out:json][timeout:25];(node["amenity"="recycling"](around:${radius},${lat},${lon});way["amenity"="recycling"](around:${radius},${lat},${lon});relation["amenity"="recycling"](around:${radius},${lat},${lon}););out center;`;
-            const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+            const url = `/api/recycling-centers?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&radius=${radius}`;
             
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Map data API error: ${response.statusText}`);
-            const data = await response.json();
+            const data = await fetchJson(url, 'Map data API request failed');
 
             // First, process all locations to calculate distance and filter
             let processedLocations = data.elements
@@ -215,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('Full error object:', error);
-            locationsGrid.innerHTML = `<p class="text-red-500 col-span-full text-center">An error occurred: ${error.message}.</p>`;
+            locationsGrid.innerHTML = `<p class="text-red-500 col-span-full text-center">${error.message}.</p>`;
         } finally {
             setLoadingState(false);
         }
@@ -247,10 +259,8 @@ document.addEventListener('DOMContentLoaded', () => {
         setLoadingState(true, `Searching for "${searchTerm}"...`, true);
         
         try {
-            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchTerm)}&format=json&limit=1&countrycodes=ph`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error('Geocoding service failed.');
-            const data = await response.json();
+            const url = `/api/geocode?q=${encodeURIComponent(searchTerm)}`;
+            const data = await fetchJson(url, 'Geocoding service failed.');
             if (data.length === 0) throw new Error(`Could not find a location for "${searchTerm}".`);
             
             findAndDisplayCenters(data[0].lat, data[0].lon);
