@@ -1,3 +1,5 @@
+import searchingAnimationUrl from '../assets/animations/Searching.lottie?url';
+
 document.addEventListener('DOMContentLoaded', () => {
 
     const locationsGrid = document.getElementById('locations-grid');
@@ -181,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return `
             <div id="locations-loading-state" class="col-span-full flex flex-col items-center justify-center rounded-3xl border border-gray-100 bg-white px-6 py-10 text-center shadow-sm">
                 <dotlottie-player
-                    src="assets/animations/Searching.lottie"
+                    src="${searchingAnimationUrl}"
                     background="transparent"
                     speed="1"
                     style="width: 320px; height: 220px;"
