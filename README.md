@@ -1,71 +1,196 @@
 # ScrapNear - Your Local Recycling Guide
 
-ScrapNear is a user-friendly web application designed to help people easily locate nearby recycling centers and junk shops. Using live map data, it provides a simple and intuitive way to find facilities for recycling various materials.
+ScrapNear is a web application that helps users find nearby recycling centers and junk shops using live map data, geolocation, and searchable addresses. It provides a simple interface for discovering the closest recycling options and viewing directions quickly.
 
 ---
 
 <p align="center">
-  <img src="scrapp.png" alt="ScrapNear Application Screenshot" width="100%">
+  <img width="1903" height="1079" alt="scrapp" src="https://github.com/user-attachments/assets/8af4f40a-d65a-46c9-9e51-1e4dfbc34d7f" />
 </p>
 
 ## Purpose
 
-The main goal of ScrapNear is to promote recycling and proper waste management by making it effortless for users to find local centers. By providing an accessible tool, the project aims to encourage more people to participate in recycling efforts, contributing to a cleaner environment.
+The goal of ScrapNear is to make recycling more accessible by helping users discover nearby facilities with as little friction as possible. By combining maps, address lookup, and location-based search, the app encourages practical day-to-day recycling habits.
+
+---
+
+## Features
+
+- **Nearby shop search**
+  - Use the **Find Shops Near Me** button to detect your current location and find the nearest recycling centers.
+
+- **Manual location search**
+  - Search by city, address, or landmark to find recycling centers near a custom location.
+
+- **Interactive map**
+  - Displays your location and nearby recycling centers using Leaflet and OpenStreetMap tiles.
+
+- **Address fetching**
+  - Fetches readable addresses for the closest matching locations and shows an animated loading state during lookup.
+
+- **Clean routes**
+  - Supports `/`, `/docs`, and `/report` in both local preview and Vercel production.
+
+- **Bug report page**
+  - Includes a dedicated report page for submitting issues and feedback.
 
 ---
 
 ## Tech Stack
 
-This project was built using a combination of modern front-end technologies, focusing on a lightweight and fast user experience.
+- **Frontend**
+  - HTML5
+  - Tailwind CSS via CDN
+  - JavaScript (ES modules)
+  - Vite
 
-* **Front-End:**
-    * HTML5
-    * **Tailwind CSS** (via CDN for rapid styling)
-    * **JavaScript (ES6+)** (for all application logic)
+- **Mapping and location**
+  - Leaflet.js
+  - OpenStreetMap tiles
+  - Browser Geolocation API
 
-* **Mapping & Geolocation:**
-    * **Leaflet.js:** A powerful open-source library for interactive maps.
-    * **OpenStreetMap APIs:**
-        * **Nominatim:** Used for geocoding (converting a search term like "Quezon City" into coordinates).
-        * **Overpass API:** Used to query the live OpenStreetMap database for recycling center locations.
+- **Data sources**
+  - Nominatim for geocoding and reverse geocoding
+  - Overpass API for recycling center queries
 
-* **Development Environment:**
-    * **Laragon:** A portable, isolated, and fast local development environment used to serve the project locally with SSL.
+- **Production API layer**
+  - Vercel serverless functions:
+    - `/api/geocode`
+    - `/api/reverse-geocode`
+    - `/api/recycling-centers`
+
+---
+
+## Project Structure
+
+```text
+api/
+  geocode.js
+  reverse-geocode.js
+  recycling-centers.js
+public/
+  assets/
+  css/
+  js/
+  docs.html
+  index.html
+  report.html
+dist/
+vite.config.mjs
+vercel.json
+package.json
+```
+
+---
+
+## Getting Started
+
+### Requirements
+
+- Node.js 18+
+- npm
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Run locally
+
+```bash
+npm run dev
+```
+
+Open the app at:
+
+```text
+http://localhost:3000
+```
+
+Available local routes:
+
+- `/`
+- `/docs`
+- `/report`
+
+### Build for production
+
+```bash
+npm run build
+```
+
+### Preview the production build locally
+
+```bash
+npm run preview
+```
 
 ---
 
 ## How to Use
 
-### 1. Local Setup
+### Automatic Search
 
-To run this project on your local machine, follow these steps:
+1. Click **Find Shops Near Me**.
+2. Allow location access when your browser asks for permission.
+3. ScrapNear will center the map on your location.
+4. The app finds the closest named recycling centers within the search radius.
+5. The top matches are listed with readable addresses and direction links.
 
-1.  **Place the Project Folder:** Ensure your `localrecycling` project folder is inside your Laragon's `www` directory.
+### Manual Search
 
-2.  **Start Laragon:** Open the Laragon application and click `Start All`.
+1. Enter a city, address, or landmark such as `Makati City`.
+2. Click **Search** or press `Enter`.
+3. ScrapNear geocodes the location and searches for nearby recycling centers.
 
-3.  **Enable SSL (Important):**
-    * Right-click on the Laragon window to open the menu.
-    * Navigate to `Menu > Apache > SSL`.
-    * Click `Enabled`. Laragon will automatically configure a security certificate.
-    * Restart Laragon's services if they don't restart automatically.
+---
 
-4.  **Access the App:** Open your web browser and navigate to the secure URL:
-    ```
-    [https://localrecycling.test/public/](https://localrecycling.test/public/)
-    ```
-    *Note: Your browser may show a security warning the first time. You can safely proceed.*
+## Data Fetching Behavior
 
-### 2. Finding Recycling Centers
+- **Local development**
+  - The app calls Nominatim and Overpass directly so Vite development works without Vercel serverless functions.
 
-There are two ways to find locations:
+- **Production deployment**
+  - The frontend uses same-origin Vercel API routes to proxy geocoding, reverse geocoding, and recycling center requests.
+  - This avoids browser-side fetch and CORS issues on the live deployment.
 
-* **Automatic Search (Recommended):**
-    1.  Click the green **"Find Centers Near Me"** button.
-    2.  Your browser will ask for permission to access your location. Click **"Allow"**.
-    3.  The app will automatically pinpoint your location on the map and display the 5 closest recycling centers.
+- **Loading state**
+  - While addresses are being fetched for the closest results, ScrapNear displays an animated dotLottie loader.
 
-* **Manual Search:**
-    1.  Type a city, address, or landmark into the search bar (e.g., "Makati City").
-    2.  Click the **"Search"** button or press Enter.
-    3.  The app will find that location and display the 5 closest recycling centers.
+---
+
+## Deployment Notes
+
+ScrapNear is configured for deployment on Vercel.
+
+- **Framework Preset**
+  - Vite
+
+- **Build Command**
+  - `npm run build`
+
+- **Output Directory**
+  - `dist`
+
+- **Root Directory**
+  - Keep this at the repository root
+
+The root `vercel.json` enables clean URLs and redirects legacy `.html` routes to:
+
+- `/`
+- `/docs`
+- `/report`
+
+---
+
+## Available Scripts
+
+- **`npm run dev`**
+  - Starts the Vite development server on `localhost:3000`.
+
+- **`npm run build`**
+  - Creates the production build in `dist`.
+
+- **`npm run preview`**
+  - Serves the production build locally for testing.
