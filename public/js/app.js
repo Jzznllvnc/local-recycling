@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const getLocationButton = document.getElementById('getLocationButton');
     const mapSection = document.getElementById('map-section');
     const defaultGetLocationButtonContent = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="2" x2="5" y1="12" y2="12"/><line x1="19" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="5"/><line x1="12" x2="12" y1="19" y2="22"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/></svg> Find Shops Near Me`;
+    const isLocalDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     
     // --- App State ---
     let map;
@@ -94,12 +95,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     async function fetchJson(url, fallbackMessage) {
         const response = await fetch(url);
+        const contentType = response.headers.get('content-type') || '';
         let data = null;
 
-        try {
+        if (contentType.includes('application/json')) {
             data = await response.json();
-        } catch (error) {
-            data = null;
+        } else {
+            const text = await response.text();
+
+            if (!response.ok) {
+                throw new Error(text || fallbackMessage);
+            }
+
+            throw new Error('Unexpected API response received.');
         }
 
         if (!response.ok) {
@@ -109,13 +117,38 @@ document.addEventListener('DOMContentLoaded', () => {
         return data;
     }
 
+    function getGeocodeUrl(searchTerm) {
+        if (isLocalDevelopment) {
+            return `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchTerm)}&format=json&limit=1&countrycodes=ph`;
+        }
+
+        return `/api/geocode?q=${encodeURIComponent(searchTerm)}`;
+    }
+
+    function getReverseGeocodeUrl(lat, lon) {
+        if (isLocalDevelopment) {
+            return `https://nominatim.openstreetmap.org/reverse?format=json&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&addressdetails=1`;
+        }
+
+        return `/api/reverse-geocode?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`;
+    }
+
+    function getRecyclingCentersUrl(lat, lon, radius) {
+        if (isLocalDevelopment) {
+            const query = `[out:json][timeout:25];(node["amenity"="recycling"](around:${radius},${lat},${lon});way["amenity"="recycling"](around:${radius},${lat},${lon});relation["amenity"="recycling"](around:${radius},${lat},${lon}););out center;`;
+            return `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+        }
+
+        return `/api/recycling-centers?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&radius=${radius}`;
+    }
+
     /**
      * Fetches a high-quality, human-readable address for a location.
      */
     async function fetchAddressForLocation(location) {
         const lat = location.type === 'node' ? location.lat : location.center.lat;
         const lon = location.type === 'node' ? location.lon : location.center.lon;
-        const url = `/api/reverse-geocode?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`;
+        const url = getReverseGeocodeUrl(lat, lon);
         
         try {
             const data = await fetchJson(url, 'Reverse geocoding request failed');
@@ -193,9 +226,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const radius = 5000; 
-            const url = `/api/recycling-centers?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&radius=${radius}`;
+            const url = getRecyclingCentersUrl(lat, lon, radius);
             
             const data = await fetchJson(url, 'Map data API request failed');
+
+            if (!data || !Array.isArray(data.elements)) {
+                throw new Error('Map data service returned an unexpected response.');
+            }
 
             // First, process all locations to calculate distance and filter
             let processedLocations = data.elements
@@ -259,8 +296,13 @@ document.addEventListener('DOMContentLoaded', () => {
         setLoadingState(true, `Searching for "${searchTerm}"...`, true);
         
         try {
-            const url = `/api/geocode?q=${encodeURIComponent(searchTerm)}`;
+            const url = getGeocodeUrl(searchTerm);
             const data = await fetchJson(url, 'Geocoding service failed.');
+
+            if (!Array.isArray(data)) {
+                throw new Error('Geocoding service returned an unexpected response.');
+            }
+
             if (data.length === 0) throw new Error(`Could not find a location for "${searchTerm}".`);
             
             findAndDisplayCenters(data[0].lat, data[0].lon);
