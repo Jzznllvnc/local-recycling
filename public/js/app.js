@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`;
         
         try {
-            const response = await fetch(url, { headers: { 'User-Agent': 'ScrapNear/1.0' } });
+            const response = await fetch(url);
             if (!response.ok) throw new Error('Reverse geocoding request failed');
             const data = await response.json();
             
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const query = `[out:json][timeout:25];(node["amenity"="recycling"](around:${radius},${lat},${lon});way["amenity"="recycling"](around:${radius},${lat},${lon});relation["amenity"="recycling"](around:${radius},${lat},${lon}););out center;`;
             const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
             
-            const response = await fetch(url, { headers: { 'User-Agent': 'ScrapNear/1.0' } });
+            const response = await fetch(url);
             if (!response.ok) throw new Error(`Map data API error: ${response.statusText}`);
             const data = await response.json();
 
@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         try {
             const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchTerm)}&format=json&limit=1&countrycodes=ph`;
-            const response = await fetch(url, { headers: { 'User-Agent': 'ScrapNear/1.0' } });
+            const response = await fetch(url);
             if (!response.ok) throw new Error('Geocoding service failed.');
             const data = await response.json();
             if (data.length === 0) throw new Error(`Could not find a location for "${searchTerm}".`);
