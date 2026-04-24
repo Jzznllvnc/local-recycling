@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchButton = document.getElementById('searchButton');
     const getLocationButton = document.getElementById('getLocationButton');
     const mapSection = document.getElementById('map-section');
+    const defaultGetLocationButtonContent = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="2" x2="5" y1="12" y2="12"/><line x1="19" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="5"/><line x1="12" x2="12" y1="19" y2="22"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/></svg> Find Shops Near Me`;
     
     // --- App State ---
     let map;
@@ -124,11 +125,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function createLoadingMarkup(message, showAnimation = false) {
+        if (!showAnimation) {
+            return `<p class="text-gray-500 col-span-full text-center">${message}</p>`;
+        }
+
+        return `
+            <div id="locations-loading-state" class="col-span-full flex flex-col items-center justify-center rounded-3xl border border-gray-100 bg-white px-6 py-10 text-center shadow-sm">
+                <dotlottie-player
+                    src="assets/animations/Searching.lottie"
+                    background="transparent"
+                    speed="1"
+                    style="width: 320px; height: 220px;"
+                    autoplay
+                    loop
+                ></dotlottie-player>
+                <p class="mt-2 text-base text-gray-500">${message}</p>
+            </div>`;
+    }
+
+    function scrollLoadingStateIntoView() {
+        const loadingState = document.getElementById('locations-loading-state');
+        const targetElement = loadingState || mapSection;
+
+        if (!targetElement) {
+            return;
+        }
+
+        const rect = targetElement.getBoundingClientRect();
+        const targetTop = rect.top + window.scrollY - (window.innerHeight / 2) + (rect.height / 2);
+
+        window.scrollTo({
+            top: Math.max(targetTop, 0),
+            behavior: 'smooth'
+        });
+    }
+
     /**
      * The main function to find and display recycling centers based on coordinates.
      */
     async function findAndDisplayCenters(lat, lon) {
-        setLoadingState(true, 'Searching for nearby recycling centers...');
+        setLoadingState(true, 'Searching for nearby recycling centers...', true);
         map.setView([lat, lon], 14);
 
         if (userMarker) map.removeLayer(userMarker);
@@ -167,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            setLoadingState(true, `Found ${top5Locations.length} closest locations, fetching addresses...`);
+            setLoadingState(true, `Found ${top5Locations.length} closest locations, fetching addresses...`, true);
 
             // Fetch high-quality addresses for ONLY the top 5
             for (const location of top5Locations) {
@@ -186,13 +223,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Event Handlers ---
     function handleGetLocation() {
-        mapSection.scrollIntoView({ behavior: 'smooth' });
-        
         if (!navigator.geolocation) {
             alert('Geolocation is not supported by your browser.');
             return;
         }
-        setLoadingState(true, 'Requesting location permission...');
+        setLoadingState(true, 'Requesting location permission...', true);
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 findAndDisplayCenters(position.coords.latitude, position.coords.longitude);
@@ -209,8 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const searchTerm = searchInput.value.trim();
         if (!searchTerm) return;
         
-        mapSection.scrollIntoView({ behavior: 'smooth' });
-        setLoadingState(true, `Searching for "${searchTerm}"...`);
+        setLoadingState(true, `Searching for "${searchTerm}"...`, true);
         
         try {
             const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchTerm)}&format=json&limit=1&countrycodes=ph`;
@@ -227,14 +261,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function setLoadingState(isLoading, message = '') {
+    function setLoadingState(isLoading, message = '', showAnimation = false) {
         searchButton.disabled = isLoading;
         getLocationButton.disabled = isLoading;
         if (isLoading) {
-            locationsGrid.innerHTML = `<p class="text-gray-500 col-span-full text-center">${message}</p>`;
-            getLocationButton.innerHTML = '...';
+            locationsGrid.innerHTML = createLoadingMarkup(message, showAnimation);
+            getLocationButton.innerHTML = 'Loading...';
+            if (showAnimation) {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        scrollLoadingStateIntoView();
+                    });
+                });
+            }
         } else {
-            getLocationButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="2" x2="5" y1="12" y2="12"/><line x1="19" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="5"/><line x1="12" x2="12" y1="19" y2="22"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/></svg> Find Shops Near Me`;
+            getLocationButton.innerHTML = defaultGetLocationButtonContent;
         }
     }
 
